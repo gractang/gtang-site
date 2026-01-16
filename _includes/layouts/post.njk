@@ -1,0 +1,36 @@
+---
+layout: layouts/base.njk
+---
+
+{% set posts = collections.writing %}
+{% set currentIndex = 0 %}
+{% for post in posts %}
+  {% if post.url == page.url %}
+    {% set currentIndex = loop.index0 %}
+  {% endif %}
+{% endfor %}
+{% set totalPosts = posts | length %}
+{% set newerPost = (currentIndex > 0) and posts[currentIndex - 1] or null %}
+{% set olderPost = (currentIndex + 1 < totalPosts) and posts[currentIndex + 1] or null %}
+
+<section class="section">
+  <a class="text-link" href="/#writing">Back to writing</a>
+  <div class="post-header">
+    <p class="eyebrow">{{ eyebrow }}</p>
+    <h1>{{ title }}</h1>
+    <p class="meta">{{ readTime }} · {{ date | readableDate }}</p>
+  </div>
+  <div class="card post-content">
+    {{ content | safe }}
+  </div>
+  {% if newerPost or olderPost %}
+    <nav class="post-nav" aria-label="More writing">
+      {% if olderPost %}
+        <a class="text-link" href="{{ olderPost.url }}">Older: {{ olderPost.data.title }}</a>
+      {% endif %}
+      {% if newerPost %}
+        <a class="text-link" href="{{ newerPost.url }}">Newer: {{ newerPost.data.title }}</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+</section>

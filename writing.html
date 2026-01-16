@@ -1,0 +1,77 @@
+---
+layout: layouts/base.njk
+title: Writing | Grace Tang
+mainId: writing-index
+permalink: /writing/
+---
+
+<section class="section">
+  <div class="section-title">
+    <h2>Writing</h2>
+    <p>All essays, newsletters, and notes in one place.</p>
+  </div>
+
+  <div class="writing-filters">
+    <label class="writing-filter">
+      <span>Search</span>
+      <input id="writing-search" type="search" placeholder="Search by title or summary" />
+    </label>
+    <label class="writing-filter">
+      <span>Type</span>
+      <select id="writing-type">
+        <option value="all">All</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="writing-list" id="writing-list">
+    {% for post in collections.writing %}
+      <a
+        class="card card-link"
+        href="{{ post.url }}"
+        data-writing-card
+        data-title="{{ post.data.title | escape }}"
+        data-summary="{{ post.data.summary | escape }}"
+        data-eyebrow="{{ post.data.eyebrow | escape }}"
+      >
+        <h3>{{ post.data.title }}</h3>
+        <p class="meta">{{ post.data.eyebrow }} · {{ post.data.readTime }} · {{ post.date | date: "%B %-d, %Y" }}</p>
+        <p>{{ post.data.summary }}</p>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("writing-search");
+    const typeSelect = document.getElementById("writing-type");
+    const cards = Array.from(document.querySelectorAll("[data-writing-card]"));
+    const types = Array.from(
+      new Set(cards.map((card) => card.dataset.eyebrow).filter(Boolean))
+    );
+
+    types.forEach((type) => {
+      const option = document.createElement("option");
+      option.value = type;
+      option.textContent = type;
+      typeSelect.appendChild(option);
+    });
+
+    const applyFilters = () => {
+      const query = searchInput.value.trim().toLowerCase();
+      const selectedType = typeSelect.value;
+
+      cards.forEach((card) => {
+        const matchesType =
+          selectedType === "all" || card.dataset.eyebrow === selectedType;
+        const haystack = `${card.dataset.title} ${card.dataset.summary}`.toLowerCase();
+        const matchesQuery = !query || haystack.includes(query);
+        card.hidden = !(matchesType && matchesQuery);
+      });
+    };
+
+    searchInput.addEventListener("input", applyFilters);
+    typeSelect.addEventListener("change", applyFilters);
+  });
+</script>
